@@ -2,6 +2,15 @@
  pydebsign is a yet another library of debsign
 ===============================================
 
+Status
+------
+
+.. image:: https://secure.travis-ci.org/mkouhei/pydebsign.png?branch=devel
+   :target: http://travis-ci.org/mkouhei/pydebsign
+.. image:: https://coveralls.io/repos/mkouhei/pydebsign/badge.png?branch=devel
+   :target: https://coveralls.io/r/mkouhei/pydebsign?branch=devel
+
+
 Motivation
 ----------
 
