@@ -1,0 +1,13 @@
+#!/bin/sh
+
+cd $(git rev-parse --show-toplevel)
+find pydebsign -name '*.pyc' -delete
+python setup.py test || exit 1
+python setup.py check -r || exit 1
+
+pychecker pydebsign/*.py
+pychecker pydebsign/tests/*.py
+pylint pydebsign
+pyflakes pydebsign
+pyflakes3 pydebsign
+flake8 pydebsign/*
