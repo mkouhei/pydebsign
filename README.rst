@@ -23,3 +23,9 @@ It was the same in the case of using gnupg-agent and keyring.::
 
 So, I decided to make a python library to do the same behavior debsign.
 
+
+Goal
+====
+
+* It is enable to sign `.changes` and `.dsc` files with GPG without the input of interactive passphrase.
+* It can also be used by a user can not login shell on the CI, such as Jenkins.
