@@ -3,7 +3,7 @@
 ===============================================
 
 Motivation
-==========
+----------
 
 `debsign` is a command of devscripts that sign a Debian .changes and .dsc file pare using GPG,
 the command cannot use in environment witout TTY, for example invokeking by CI.
@@ -25,7 +25,8 @@ So, I decided to make a python library to do the same behavior debsign.
 
 
 Goal
-====
+----
 
 * It is enable to sign `.changes` and `.dsc` files with GPG without the input of interactive passphrase.
 * It can also be used by a user can not login shell on the CI, such as Jenkins.
+
