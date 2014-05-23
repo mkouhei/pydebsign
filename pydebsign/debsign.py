@@ -12,6 +12,7 @@ optional:
 """
 import hashlib
 import gnupg
+import deb822
 
 
 class Debsign(object):
@@ -24,14 +25,20 @@ class Debsign(object):
         Returns: `bool` True is signed, False is unsigned.
         :param file_path: expecting .dsc file or .changes file.
         """
-        pass
+        with open(file_path, 'rb') as fileobj:
+            if self.gpg.verify(fileobj.read()).status is None:
+                return False
+            else:
+                return True
 
     def parse_changes(self, changes_path):
         """ parse .changes and retrieve efile size and file name list.
         Returns: file list with file size and checksums.
         :param changes_path: .changes file path
         """
-        pass
+        with open(changes_path, 'rb') as fileobj:
+            changes = deb822.Changes(fileobj)
+        return [_file for _file in changes['Files']]
 
     def retrieve_dsc_path(self, file_list):
         """ retrieve dsc file path from file list.
@@ -103,7 +110,8 @@ class Debsign(object):
         Returns: `bool` True is valid, False is invalid
         :param file_path: expecting .dsc file path or .changes file path
         """
-        pass
+        with open(file_path) as fileobj:
+            return self.gpg.verify(fileobj.read()).valid
 
     def verify_with_dput(self, changes_path):
         """ verify .changes and .dsc files with `dput` command.

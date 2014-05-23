@@ -46,7 +46,8 @@ long_description = (
     open(os.path.join("docs", "TODO.rst")).read())
 
 requires = ['setuptools',
-            'python_gnupg']
+            'python_gnupg',
+            'python_debian']
 
 setup(name='pydebsign',
       version='0.1.0',
