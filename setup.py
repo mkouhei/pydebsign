@@ -4,6 +4,8 @@ import os.path
 import sys
 from setuptools import setup
 from setuptools.command.test import test as TestCommand
+import subprocess
+import shlex
 import multiprocessing
 
 
@@ -48,6 +50,16 @@ long_description = (
 requires = ['setuptools',
             'python_gnupg',
             'python_debian']
+
+
+def check_debian_packages():
+    command = 'dpkg -l gnupg dput lintian'
+    with open(os.devnull, 'w') as devnull:
+        if subprocess.call(shlex.split(command), stdout=devnull) == 0:
+            return True
+        else:
+            sys.exit(1)
+check_debian_packages()
 
 setup(name='pydebsign',
       version='0.1.0',

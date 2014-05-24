@@ -39,3 +39,20 @@ Goal
 * It is enable to sign `.changes` and `.dsc` files with GPG without the input of interactive passphrase.
 * It can also be used by a user can not login shell on the CI, such as Jenkins.
 
+
+Requires
+--------
+
+* Debian system, or the system derived from Debian.
+* Debian package as follows;
+
+  * gnupg
+  * dput
+  * lintian
+  * python (= python2.7) or python3
+
+* Python packages as follows;
+
+  * python_gnupg (as debian package is python-gnupg or python3-gnupg)
+  * python_debian (as debian package is python-debian or python3-debian)
+
