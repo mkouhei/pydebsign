@@ -21,13 +21,16 @@ import deb822
 
 class Debsign(object):
     """ debsign class """
-    def __init__(self, changes_path, passphrase=None):
+    def __init__(self, changes_path, passphrase=None,
+                 keyrings=None, keyid=None):
         """
         :param changes_path: .changes file path
         :param passphrase: passphrase of GPG secret key,
                            using gpg-agent when this is None.
                            But cannot use execuceded gpg-agent
                            by another shell session.
+        :param keyrings: `list` of file path of specific keyring
+        :param keyid: id for the key which will be used to do the signing
         """
         self.changes_path = os.path.abspath(changes_path)
         self.dsc_path = ''
@@ -37,7 +40,12 @@ class Debsign(object):
         else:
             self.passphrase = None
             use_agent = True
-        self.gpg = gnupg.GPG(use_agent=use_agent)
+        if isinstance(keyrings, list):
+            keyrings = [os.path.abspath(keyring) for keyring in keyrings]
+        self.keyid = keyid
+        self.gpg = gnupg.GPG(use_agent=use_agent,
+                             keyring=keyrings,
+                             verbose=True)
 
     def initialize(self):
         """ initialize common propeties """
@@ -84,7 +92,8 @@ class Debsign(object):
         """
         with open(self.changes_path, 'rb') as fileobj:
             data = fileobj.read()
-        signed_data = self.gpg.sign(data, passphrase=self.passphrase)
+        signed_data = self.gpg.sign(data, passphrase=self.passphrase,
+                                    keyid=self.keyid)
         if signed_data.fingerprint is None and signed_data.type is None:
             return False
 
@@ -103,7 +112,8 @@ class Debsign(object):
         """
         with open(self.dsc_path, 'rb') as fileobj:
             data = fileobj.read()
-        signed_data = self.gpg.sign(data, passphrase=self.passphrase)
+        signed_data = self.gpg.sign(data, passphrase=self.passphrase,
+                                    keyid=self.keyid)
         if signed_data.fingerprint is None and signed_data.type is None:
             return False
 
@@ -218,9 +228,10 @@ class Debsign(object):
         return True
 
 
-def debsign_process(changes_path, passphrase=None):
+def debsign_process(changes_path, passphrase=None, keyrings=None, keyid=None):
     """ debsign process sequence """
-    dbsg = Debsign(changes_path, passphrase=passphrase)
+    dbsg = Debsign(changes_path, passphrase=passphrase,
+                   keyrings=keyrings, keyid=keyid)
     dbsg.initialize()
     file_list = dbsg.parse_changes()
 
