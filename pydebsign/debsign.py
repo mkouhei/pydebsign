@@ -230,13 +230,14 @@ def debsign_process(changes_path, passphrase=None):
         return dbsg.verification(dsc_filesize, dsc_checksums, file_list)
 
     if dbsg.is_signed(dbsg.dsc_path) is False:
-        status_code = dbsg.signing_dsc()
+        if dbsg.signing_dsc() is False:
+            return False
         dsc_checksums = dbsg.retrieve_checksums(dbsg.dsc_path)
         dsc_filesize = dbsg.retrieve_filesize(dbsg.dsc_path)
-        if status_code:
-            dbsg.rewrite_changes(dsc_filesize, dsc_checksums)
+        dbsg.rewrite_changes(dsc_filesize, dsc_checksums)
 
-    dbsg.signing_changes()
+    if dbsg.signing_changes() is False:
+        return False
     signed_file_list = dbsg.parse_changes()
     return dbsg.verification(dsc_filesize, dsc_checksums, signed_file_list)
 
