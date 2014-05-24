@@ -22,12 +22,20 @@ import deb822
 class Debsign(object):
     """ debsign class """
     def __init__(self, changes_path, passphrase=None):
+        """
+        :param changes_path: .changes file path
+        :param passphrase: passphrase of GPG secret key,
+                           using gpg-agent when this is None.
+                           But cannot use execuceded gpg-agent
+                           by another shell session.
+        """
         self.changes_path = os.path.abspath(changes_path)
         self.dsc_path = ''
         if passphrase:
             self.passphrase = passphrase
             use_agent = False
         else:
+            self.passphrase = None
             use_agent = True
         self.gpg = gnupg.GPG(use_agent=use_agent)
 
@@ -77,8 +85,14 @@ class Debsign(object):
         with open(self.changes_path, 'rb') as fileobj:
             data = fileobj.read()
         signed_data = self.gpg.sign(data, passphrase=self.passphrase)
+        if signed_data.fingerprint is None and signed_data.type is None:
+            return False
+
         with open(self.changes_path, 'w') as fileobj:
-            fileobj.write(signed_data.data)
+            if isinstance(signed_data.data, bytes):
+                fileobj.write(signed_data.data.decode('utf-8'))
+            else:
+                fileobj.write(signed_data.data)
         return True
 
     def signing_dsc(self):
@@ -90,8 +104,14 @@ class Debsign(object):
         with open(self.dsc_path, 'rb') as fileobj:
             data = fileobj.read()
         signed_data = self.gpg.sign(data, passphrase=self.passphrase)
+        if signed_data.fingerprint is None and signed_data.type is None:
+            return False
+
         with open(self.dsc_path, 'w') as fileobj:
-            fileobj.write(signed_data.data)
+            if isinstance(signed_data.data, bytes):
+                fileobj.write(signed_data.data.decode('utf-8'))
+            else:
+                fileobj.write(signed_data.data)
         return True
 
     def rewrite_changes(self, filesize, checksums):
@@ -139,21 +159,32 @@ class Debsign(object):
         """ verify file size with file list retrieved from changes.
         Returns: `bool` True is valid, False is invalid.
         :param dsc_filesize: `int` file size of .dsc
-        :param file_list: expecting file list as return of parse_changes().
+        :param file_list: `list` of file list as return of parse_changes().
         """
         pattern = re.compile(r'.dsc\Z')
-        return dsc_filesize == [int(_file.get('size')) for _file in file_list
+        return dsc_filesize == [int(_file.get('size'))
+                                for _file in file_list[0]
                                 if pattern.search(_file.get('name'))][0]
 
     def verify_checksums(self, dsc_checksums, file_list):
         """ verify checksums (and size) with file list retrieved from changes.
         Returns: `bool` True is valid, False is invalid.
-        :param file_list: expecting file list as return of parse_changes().
+        :param file_list: `list` of file list as return of parse_changes().
         """
         pattern = re.compile(r'.dsc\Z')
-        return dsc_checksums[0] == [_file.get('md5sum')
-                                    for _file in file_list[0]
-                                    if pattern.search(_file.get('name'))][0]
+        if dsc_checksums[0] != [_file.get('md5sum')
+                                for _file in file_list[0]
+                                if pattern.search(_file.get('name'))][0]:
+            return False
+        if dsc_checksums[1] != [_file.get('sha1')
+                                for _file in file_list[0]
+                                if pattern.search(_file.get('name'))][0]:
+            return False
+        if dsc_checksums[2] != [_file.get('sha256')
+                                for _file in file_list[0]
+                                if pattern.search(_file.get('name'))][0]:
+            return False
+        return True
 
     def verify_signature(self, file_path):
         """ verify signature of file with GPG key.
@@ -168,7 +199,7 @@ class Debsign(object):
         and automatically inclide a lintian run any moure.
         Returns: `bool` True is valid, False is invalid.
         """
-        command = 'dput -ol %s' % self.changes_path
+        command = 'dput -ol local %s' % self.changes_path
         args = shlex.split(command)
         return subprocess.call(args)
 
@@ -177,7 +208,7 @@ class Debsign(object):
         Returns: `bool` True is valid, False is invalid.
         :param dsc_filesize: `int` file size retreived from .changes
         :param dsc_checksums: `tuple` .dsc checksums retrieved from .changes
-        :param file_list: `list` file list retrieve .changes
+        :param file_list: `list` list of file list retrieve .changes
         """
         self.verify_filesize(dsc_filesize, file_list)
         self.verify_checksums(dsc_checksums, file_list)
@@ -187,28 +218,27 @@ class Debsign(object):
         return True
 
 
-def debsign_process(changes_path, passphrase):
+def debsign_process(changes_path, passphrase=None):
     """ debsign process sequence """
-    dbsg = Debsign(changes_path, passphrase)
+    dbsg = Debsign(changes_path, passphrase=passphrase)
     dbsg.initialize()
     file_list = dbsg.parse_changes()
 
     if dbsg.is_signed(changes_path):
         dsc_checksums = dbsg.retrieve_checksums(dbsg.dsc_path)
         dsc_filesize = dbsg.retrieve_filesize(dbsg.dsc_path)
-        dbsg.verification(dsc_filesize, dsc_checksums, file_list)
+        return dbsg.verification(dsc_filesize, dsc_checksums, file_list)
 
     if dbsg.is_signed(dbsg.dsc_path) is False:
-        dbsg.signing_dsc()
+        status_code = dbsg.signing_dsc()
         dsc_checksums = dbsg.retrieve_checksums(dbsg.dsc_path)
         dsc_filesize = dbsg.retrieve_filesize(dbsg.dsc_path)
-        dbsg.rewrite_changes(dsc_filesize, dsc_checksums)
+        if status_code:
+            dbsg.rewrite_changes(dsc_filesize, dsc_checksums)
 
     dbsg.signing_changes()
     signed_file_list = dbsg.parse_changes()
-
-    dbsg.verification(dsc_filesize, dsc_checksums, signed_file_list)
-    return True
+    return dbsg.verification(dsc_filesize, dsc_checksums, signed_file_list)
 
 
 def rewrite_data(changes_obj, hash_type, filesize, hashdigest):
