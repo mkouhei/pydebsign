@@ -49,7 +49,8 @@ long_description = (
 
 requires = ['setuptools',
             'python_gnupg',
-            'python_debian']
+            'python_debian',
+            'chardet']
 
 
 def check_debian_packages():

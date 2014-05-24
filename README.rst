@@ -55,4 +55,4 @@ Requires
 
   * python_gnupg (as debian package is python-gnupg or python3-gnupg)
   * python_debian (as debian package is python-debian or python3-debian)
-
+  * chardet (as debian package is python-chardet or python3-chardet)
