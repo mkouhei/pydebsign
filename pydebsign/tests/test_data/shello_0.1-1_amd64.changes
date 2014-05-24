@@ -1,0 +1,31 @@
+Format: 1.8
+Date: Sun, 18 May 2014 22:19:12 +0900
+Source: shello
+Binary: shello
+Architecture: source all
+Version: 0.1-1
+Distribution: unstable
+Urgency: low
+Maintainer: Dummy Maintainer <dummy@example.org>
+Changed-By: Dummy Maintainer <dummy@example.org>
+Description: 
+ shello     - hello world for shell script
+Changes: 
+ shello (0.1-1) unstable; urgency=low
+ .
+   * Initial release (Closes: #nnnn)
+Checksums-Sha1: 
+ 5151003775bfaf34d4eb4c2882386582885e801f 789 shello_0.1-1.dsc
+ b78f043dd0582711f7c52b35245589f1a400ccb0 877 shello_0.1.orig.tar.gz
+ 477cceff19e2ab7227657d8712fe3c82968ff88e 2152 shello_0.1-1.debian.tar.xz
+ fa60edec971bfa87b552a9f8d6ed62b46859425b 2184 shello_0.1-1_all.deb
+Checksums-Sha256: 
+ 0469259682a72c2d6c08fc79b0c0e81221b0a8f48f6841c22618b36eebe90828 789 shello_0.1-1.dsc
+ 9ec1e76f3aefb894cb808d3ab766c26c4eab8618bdb54a65223f2205e89a881d 877 shello_0.1.orig.tar.gz
+ e22e1c315c259b7f7b0bd25d840b6094dd37929981a5afd1993bc116948c2e37 2152 shello_0.1-1.debian.tar.xz
+ d59e0e5fb8933e996aa5a9099cd7e19bb065f658446c5f56505e664864223636 2184 shello_0.1-1_all.deb
+Files: 
+ c57864236e3e28413a29eeea448b8b79 2184 misc optional shello_0.1-1_all.deb
+ da47c79805c77f2b4ce3be33332c3e55 789 misc optional shello_0.1-1.dsc
+ d9178218c1a16840a2690bfaa755feec 877 misc optional shello_0.1.orig.tar.gz
+ f1c08a4a6939adbeb3f3733436fcc0db 2152 misc optional shello_0.1-1.debian.tar.xz

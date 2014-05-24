@@ -2,10 +2,22 @@
 """ pydebsing.tests.test_pydebsign """
 
 import unittest
+import shutil
+from pydebsign import debsign
 
 
 class PydebsignTests(unittest.TestCase):
     """ Unit test of pydebsign """
+
+    def setUp(self):
+        shutil.copytree('pydebsign/tests/test_data', '_build')
+        self.keyrings = ['misc/dummy_gpg/secring.gpg',
+                         'misc/dummy_gpg/pubring.gpg']
+        self.keyid = '5BAFE1FA'
+        self.passphrase = 'password'
+
+    def tearDown(self):
+        shutil.rmtree('_build')
 
     def test_normal_case(self):
         """ signing .changes and verifying process is as follows;
@@ -17,7 +29,18 @@ class PydebsignTests(unittest.TestCase):
         6. Verify signature of .dsc and .changes
         7. Verify .changes file with `dput -o .changes` command.
         """
-        pass
+        self.assertTrue(
+            debsign.debsign_process('_build/shello_0.1-1_amd64.changes',
+                                    passphrase=self.passphrase,
+                                    keyrings=self.keyrings,
+                                    keyid=self.keyid))
+
+    def test_invalid_passphrase(self):
+        """ trying debsign with invalid passphrase """
+        self.assertFalse(
+            debsign.debsign_process('_build/shello_0.1-1_amd64.changes',
+                                    passphrase='dummy',
+                                    keyrings=self.keyrings))
 
     def test_signed_dsc(self):
         """ signing .changes and verifying process is as follows;
