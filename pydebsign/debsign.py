@@ -22,7 +22,7 @@ import deb822
 class Debsign(object):
     """ debsign class """
     def __init__(self, changes_path, passphrase=None):
-        self.changes_path = changes_path
+        self.changes_path = os.path.abspath(changes_path)
         self.dsc_path = ''
         if passphrase:
             self.passphrase = passphrase
@@ -30,6 +30,13 @@ class Debsign(object):
         else:
             use_agent = True
         self.gpg = gnupg.GPG(use_agent=use_agent)
+
+    def initialize(self):
+        """ initialize common propeties """
+        base_path = os.path.dirname(os.path.abspath(self.changes_path))
+        file_list = self.parse_changes()
+        self.dsc_path = os.path.join(base_path,
+                                     self.retrieve_dsc_path(file_list[0]))
 
     def is_signed(self, file_path):
         """ check file is signed with GPG key,
@@ -94,9 +101,21 @@ class Debsign(object):
         ---
         Returns: status code
         :param filesize: expecting `int` .dsc file size
-        :param checksums: expecting `tuple` of md5, sha1, sha256 hexdigest
+        :param checksums: expecting `tuple` of md5sum, sha1, sha256 hexdigest
         """
-        pass
+        with open(self.changes_path, 'rb') as fileobj:
+            changes = deb822.Changes(fileobj)
+        # md5sum
+        rewrite_data(changes, ('Files', 'md5sum'), filesize, checksums[0])
+        # sha1
+        rewrite_data(changes, ('Checksums-Sha1', 'sha1'),
+                     filesize, checksums[1])
+        # sha1
+        rewrite_data(changes, ('Checksums-Sha256', 'sha256'),
+                     filesize, checksums[2])
+        with open(self.changes_path, 'w') as fileobj:
+            fileobj.write(changes.dump())
+        return True
 
     def retrieve_checksums(self, file_path):
         """ retrieve md5, sha1, sha256 checksums.
@@ -108,6 +127,13 @@ class Debsign(object):
         return (hashlib.md5(data).hexdigest(),
                 hashlib.sha1(data).hexdigest(),
                 hashlib.sha256(data).hexdigest())
+
+    def retrieve_filesize(self, file_path):
+        """ retrieve file size.
+        Returns: `int` fils size
+        :param file_path: `str` absolute file path
+        """
+        return os.path.getsize(file_path)
 
     def verify_filesize(self, dsc_filesize, file_list):
         """ verify file size with file list retrieved from changes.
@@ -164,19 +190,18 @@ class Debsign(object):
 def debsign_process(changes_path, passphrase):
     """ debsign process sequence """
     dbsg = Debsign(changes_path, passphrase)
-
+    dbsg.initialize()
     file_list = dbsg.parse_changes()
-    dbsg.dsc_path = dbsg.retrieve_dsc_path(file_list[0])
 
     if dbsg.is_signed(changes_path):
         dsc_checksums = dbsg.retrieve_checksums(dbsg.dsc_path)
-        dsc_filesize = os.path.getsize(dbsg.dsc_path)
+        dsc_filesize = dbsg.retrieve_filesize(dbsg.dsc_path)
         dbsg.verification(dsc_filesize, dsc_checksums, file_list)
 
     if dbsg.is_signed(dbsg.dsc_path) is False:
         dbsg.signing_dsc()
         dsc_checksums = dbsg.retrieve_checksums(dbsg.dsc_path)
-        dsc_filesize = os.path.getsize(dbsg.dsc_path)
+        dsc_filesize = dbsg.retrieve_filesize(dbsg.dsc_path)
         dbsg.rewrite_changes(dsc_filesize, dsc_checksums)
 
     dbsg.signing_changes()
@@ -184,3 +209,18 @@ def debsign_process(changes_path, passphrase):
 
     dbsg.verification(dsc_filesize, dsc_checksums, signed_file_list)
     return True
+
+
+def rewrite_data(changes_obj, hash_type, filesize, hashdigest):
+    """ rewrite .changes object with new file size and hashdigest.
+    :param changes_obj: :class:`Deb822Dict` object
+    :param hash_type: `tuple` hash type of .changes
+    :param filesize: expecting `int` .dsc file size
+    :param hashdigest: expecting `str` .dsc hash digest
+    """
+    pattern = re.compile(r'.dsc\Z')
+    line = [line for line in changes_obj[hash_type[0]]
+            if pattern.search(line.get('name'))][0]
+    line_index = changes_obj[hash_type[0]].index(line)
+    changes_obj[hash_type[0]][line_index]['size'] = str(filesize)
+    changes_obj[hash_type[0]][line_index][hash_type[1]] = hashdigest
