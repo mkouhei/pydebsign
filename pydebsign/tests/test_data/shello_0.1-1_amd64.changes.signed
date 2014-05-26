@@ -1,0 +1,51 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+Format: 1.8
+Date: Sun, 18 May 2014 22:19:12 +0900
+Source: shello
+Binary: shello
+Architecture: source all
+Version: 0.1-1
+Distribution: unstable
+Urgency: low
+Maintainer: Dummy Maintainer <dummy@example.org>
+Changed-By: Dummy Maintainer <dummy@example.org>
+Description:
+ shello     - hello world for shell script
+Changes:
+ shello (0.1-1) unstable; urgency=low
+ .
+   * Initial release (Closes: #nnnn)
+Checksums-Sha1:
+ b6ac0a232d6721249536c1f04815204b2495f366 1658 shello_0.1-1.dsc
+ b78f043dd0582711f7c52b35245589f1a400ccb0 877 shello_0.1.orig.tar.gz
+ 477cceff19e2ab7227657d8712fe3c82968ff88e 2152 shello_0.1-1.debian.tar.xz
+ fa60edec971bfa87b552a9f8d6ed62b46859425b 2184 shello_0.1-1_all.deb
+Checksums-Sha256:
+ 55043043d3507dc42d85811658b5320ee4cc2fc793dadd1545eaa7bc9c2fdced 1658 shello_0.1-1.dsc
+ 9ec1e76f3aefb894cb808d3ab766c26c4eab8618bdb54a65223f2205e89a881d 877 shello_0.1.orig.tar.gz
+ e22e1c315c259b7f7b0bd25d840b6094dd37929981a5afd1993bc116948c2e37 2152 shello_0.1-1.debian.tar.xz
+ d59e0e5fb8933e996aa5a9099cd7e19bb065f658446c5f56505e664864223636 2184 shello_0.1-1_all.deb
+Files:
+ c57864236e3e28413a29eeea448b8b79 2184 misc optional shello_0.1-1_all.deb
+ a119310a9c244df07bb6035baf85fa75 1658 misc optional shello_0.1-1.dsc
+ d9178218c1a16840a2690bfaa755feec 877 misc optional shello_0.1.orig.tar.gz
+ f1c08a4a6939adbeb3f3733436fcc0db 2152 misc optional shello_0.1-1.debian.tar.xz
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJTgrwjAAoJEHW3/JhaBGxTmC4P/iNVz6XrNNzCtJXFdJizggZr
+BzIfzTuttgt2Tn4ArP92htAPcrfHFavpfcc6cioTxtDivrxJmHCyY39TEreJfIxc
+r0BiDh0QHj7upJGsm8sPK+1PVPfQ2pGzbl+B+GaZgCVKbbRFXekydwvEqS3lxXsk
+ZWqWu9QQT3jxQ40K4Uh0oZ+kMNA4ugcvsBlP2dLv1mJ0BQ9RG/c+mNaV7uMcF65H
+sJLKGZWEfR6EHR9ucRRTfpQmcaYzVxM2/w4beJeMgng/p0kVofFRUVoYen9URbI3
+irwjLUtCOYQLlXVR3mdLSO0x+zW8I90X89ZCS5RnlXInPpFdB4HLOHweEfMiZJtP
+6lgLQRCnPKcwsTN7EEooODKKnAIap32/7y9DH/zSWHenhH/+U5XUpcUR3grj+aa2
+tFQfQVBxizSLlJsK/hZMLlja3kwwd0wvGFbSGweD7l3G43sVIGlSYitREemsTgsr
+qkE4N5mr6X4kpeCXpjX/rudz9xxjBbEDi/gOAa/q7VbbKGK8v1glJPf1C5m1rgeE
+1n+wYDkGjwNUSYlgzW3ygTjhCQeVTaHPePoiJsp6sOZoKk3Sg1YifodM45Utdb8p
+w1eAYd7gFyK/vPZHXKQqE5+HbX3f3iDNw1JBzt1ToFwJwg087YY+I602SiMHytNV
+Sv4b68hiO3+8Mzj/AI96
+=jpKy
+-----END PGP SIGNATURE-----

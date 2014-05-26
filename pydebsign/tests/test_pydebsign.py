@@ -93,7 +93,16 @@ class PydebsignTests(unittest.TestCase):
         3. Retrieve size and checksums of .dsc from .changes
         4. Verify checksums from .changes and retreived checksums
         """
-        pass
+        dbsg = debsign.Debsign(self.changes_path,
+                               passphrase='password',
+                               keyid=self.keyid,
+                               gnupghome=self.gnupghome)
+        dbsg.initialize()
+        shutil.copyfile('%s.signed' % self.changes_path, self.changes_path)
+        shutil.copyfile('%s.signed' % dbsg.dsc_path, dbsg.dsc_path)
+        self.assertTrue(debsign.debsign_process(self.changes_path,
+                                                passphrase='password',
+                                                gnupghome=self.gnupghome))
 
     def test_invalid_signed_changes(self):
         """ signing .changes and verifying process is as follows;
@@ -102,4 +111,9 @@ class PydebsignTests(unittest.TestCase):
         3. Retrieve size and checksums of .dsc from .changes
         4. Fail to verify checksums from .changes and retreived checksums
         """
-        pass
+        shutil.copyfile('%s.signed' % self.changes_path, self.changes_path)
+        self.assertRaises(ValueError,
+                          debsign.debsign_process,
+                          self.changes_path,
+                          passphrase='password',
+                          gnupghome=self.gnupghome)

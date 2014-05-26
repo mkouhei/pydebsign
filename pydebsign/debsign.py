@@ -22,7 +22,7 @@ import deb822
 class Debsign(object):
     """ debsign class """
     def __init__(self, changes_path, passphrase=None,
-                 keyid=None, gnupghome=None):
+                 keyid=None, gnupghome=None, verbose=False):
         """
         :param changes_path: .changes file path
         :param passphrase: passphrase of GPG secret key,
@@ -45,9 +45,9 @@ class Debsign(object):
             os.environ['GNUPGHOME'] = os.path.abspath(gnupghome)
             self.gpg = gnupg.GPG(gnupghome=gnupghome,
                                  use_agent=use_agent,
-                                 verbose=True)
+                                 verbose=verbose)
         else:
-            self.gpg = gnupg.GPG(use_agent=use_agent, verbose=True)
+            self.gpg = gnupg.GPG(use_agent=use_agent, verbose=verbose)
 
     def initialize(self):
         """ initialize common propeties """
@@ -196,16 +196,17 @@ class Debsign(object):
         :param file_list: `list` of file list as return of parse_changes().
         """
         pattern = re.compile(r'.dsc\Z')
+
         if dsc_checksums[0] != [_file.get('md5sum')
                                 for _file in file_list[0]
                                 if pattern.search(_file.get('name'))][0]:
             return False
         if dsc_checksums[1] != [_file.get('sha1')
-                                for _file in file_list[0]
+                                for _file in file_list[1]
                                 if pattern.search(_file.get('name'))][0]:
             return False
         if dsc_checksums[2] != [_file.get('sha256')
-                                for _file in file_list[0]
+                                for _file in file_list[2]
                                 if pattern.search(_file.get('name'))][0]:
             return False
         return True
@@ -234,11 +235,21 @@ class Debsign(object):
         :param dsc_checksums: `tuple` .dsc checksums retrieved from .changes
         :param file_list: `list` list of file list retrieve .changes
         """
-        self.verify_filesize(dsc_filesize, file_list)
-        self.verify_checksums(dsc_checksums, file_list)
-        self.verify_signature(self.dsc_path)
-        self.verify_signature(self.changes_path)
-        self.verify_with_dput()
+        if self.verify_filesize(dsc_filesize, file_list) is False:
+            raise ValueError('diffrence file size of .dsc')
+
+        if self.verify_checksums(dsc_checksums, file_list) is False:
+            raise ValueError('invalid checksums of .dsc')
+
+        if self.verify_signature(self.dsc_path) is False:
+            raise ValueError('invalid signature of .dsc')
+
+        if self.verify_signature(self.changes_path) is False:
+            raise ValueError('invalid signature of .changes')
+
+        if self.verify_with_dput() != 0:
+            raise ValueError('invalid checking with dput')
+
         return True
 
 
