@@ -23,7 +23,6 @@ class Tox(TestCommand):
 
 classifiers = [
     "Development Status :: 3 - Alpha",
-    "License :: OSI Approved :: ",
     "License :: OSI Approved :: ISC License (ISCL)",
     "Programming Language :: Python",
     "Programming Language :: Python :: 2",
