@@ -1,0 +1,40 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+Format: 3.0 (quilt)
+Source: shello
+Binary: shello
+Architecture: all
+Version: 0.1-1
+Maintainer: Dummy Maintainer <dummy@example.org>
+Homepage: https://github.com/mkouhei/shello
+Standards-Version: 3.9.5
+Build-Depends: debhelper (>= 9.0.0)
+Package-List: 
+ shello deb misc optional arch=all
+Checksums-Sha1: 
+ b78f043dd0582711f7c52b35245589f1a400ccb0 877 shello_0.1.orig.tar.gz
+ 477cceff19e2ab7227657d8712fe3c82968ff88e 2152 shello_0.1-1.debian.tar.xz
+Checksums-Sha256: 
+ 9ec1e76f3aefb894cb808d3ab766c26c4eab8618bdb54a65223f2205e89a881d 877 shello_0.1.orig.tar.gz
+ e22e1c315c259b7f7b0bd25d840b6094dd37929981a5afd1993bc116948c2e37 2152 shello_0.1-1.debian.tar.xz
+Files: 
+ d9178218c1a16840a2690bfaa755feec 877 shello_0.1.orig.tar.gz
+ f1c08a4a6939adbeb3f3733436fcc0db 2152 shello_0.1-1.debian.tar.xz
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+IQIcBAEBAgAGBQJTgqjrAAoJEHW3/JhaBGxTnCIP/i/uHCvo5HwEnuhw1yzMzytq
+K+vExx73+pOHj1BYaQnGybNLqQzgO8gUbvGltjS3vlZ1vHjlhWC/n6mYnT1bCL4G
+/8ZCYPArObR9cuL5wKHCfm40bnVqnG2KQWgznRKUWedEY1h0SoErixVpOcnyGxHR
+3uQ0paoMKkFsLy7YQZGmLlbQibZzu7sTVmz3nSAPslIi9aphTAhroghY534Sflkv
+3Sa87pO6+l7MdAalJtShPBHFACMRS+vZINKEproZuMUfuR+DahM3muq+q3KZbn2o
+xsX9/dNh3TvVxb7kE+DEwpiSmYTdKek8EJU6xIPzfr0G8/TBeF3+u01vRsoPTwUk
+og5b8AIRoIMkQXfQTfW8HB2yaM9iAaEYgrxLwHX/4z9rP1BfJnuvMrtyvSXqECPa
+wux92I0e/KtxHqZvuo62FV24kecdG34S21XC15pvg9FvWd0dUZlsQosfHjQCkf6H
+aDcFxvHcL73GlI/3Y8ZlnYANJ2qW2icwwTPKHaVktEG/xsMSBFLtF4Ba0b70u4de
+hLXTsgSnN2ZILYNIHeCx8Hq6QZLRHhx1LMd6qRMO7WMfK37x5xiuVrjOIaZ/9NGG
+MF8084fN87jHkczjZ3ppbA8m1PPtdxFrkAQq2wPBQTjEbNjNj3wkIZxxuCGaHj/L
+JjOE4rvoc4ecZgcRWlgU
+=lJBm
+-----END PGP SIGNATURE-----

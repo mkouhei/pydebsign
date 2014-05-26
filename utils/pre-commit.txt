@@ -1,0 +1,27 @@
+#!/bin/sh
+
+cleanup() {
+    find pydebsign -name '*.pyc' -delete
+    find pydebsign -name '*~' -delete
+}
+
+cd $(git rev-parse --show-toplevel)
+cleanup
+python setup.py test || exit 1
+python setup.py check -r || exit 1
+
+cleanup
+pychecker pydebsign/*.py
+pychecker pydebsign/tests/*.py
+
+cleanup
+pylint pydebsign
+
+cleanup
+pyflakes pydebsign
+
+cleanup
+pyflakes3 pydebsign
+
+cleanup
+flake8 pydebsign/*

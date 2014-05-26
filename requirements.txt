@@ -1,0 +1,2 @@
+python_gnupg
+python_debian
