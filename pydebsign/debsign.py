@@ -62,10 +62,22 @@ class Debsign(object):
         :param file_path: expecting .dsc file or .changes file.
         """
         with open(file_path, 'rb') as fileobj:
-            if self.gpg.verify(fileobj.read()).status is None:
-                return False
+            data = fileobj.read()
+            if isinstance(data, bytes):
+                # for Python 3
+                data = data.decode('utf-8')
+
+            if data.find('-----BEGIN PGP SIGNED MESSAGE-----') == 0:
+                # signed data why found gpg header
+                if self.gpg.verify(data).status is None:
+                    # invalid signed data
+                    raise ValueError('invalid signed data')
+                else:
+                    # valid signed data
+                    return True
             else:
-                return True
+                # not signed data
+                return False
 
     def parse_changes(self):
         """ parse .changes and retrieve efile size and file name list.

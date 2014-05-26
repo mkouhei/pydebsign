@@ -73,7 +73,18 @@ class PydebsignTests(unittest.TestCase):
         5. Signing .changes file with GPG key.
         6. Fail to verify checksums from .changes and retreived checksums
         """
-        pass
+        dbsg = debsign.Debsign(self.changes_path,
+                               passphrase='password',
+                               keyid=self.keyid,
+                               gnupghome=self.gnupghome)
+        dbsg.initialize()
+        dbsg.signing_dsc()
+        shutil.copyfile('%s.invalid' % dbsg.dsc_path, dbsg.dsc_path)
+        self.assertRaises(ValueError,
+                          debsign.debsign_process,
+                          self.changes_path,
+                          passphrase='password',
+                          gnupghome=self.gnupghome)
 
     def test_signed_changes(self):
         """ signing .changes and verifying process is as follows;
