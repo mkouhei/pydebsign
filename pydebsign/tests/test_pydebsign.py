@@ -15,6 +15,7 @@ class PydebsignTests(unittest.TestCase):
         self.gnupghome = os.path.abspath('misc/dummy_gpg')
         self.keyid = '5A046C53'
         self.passphrase = 'password'
+        self.changes_path = '_build/shello_0.1-1_amd64.changes'
 
     def tearDown(self):
         shutil.rmtree('_build')
@@ -30,7 +31,7 @@ class PydebsignTests(unittest.TestCase):
         7. Verify .changes file with `dput -o .changes` command.
         """
         self.assertTrue(
-            debsign.debsign_process('_build/shello_0.1-1_amd64.changes',
+            debsign.debsign_process(self.changes_path,
                                     passphrase=self.passphrase,
                                     keyid=self.keyid,
                                     gnupghome=self.gnupghome))
@@ -38,7 +39,7 @@ class PydebsignTests(unittest.TestCase):
     def test_invalid_passphrase(self):
         """ trying debsign with invalid passphrase """
         self.assertFalse(
-            debsign.debsign_process('_build/shello_0.1-1_amd64.changes',
+            debsign.debsign_process(self.changes_path,
                                     passphrase='dummy',
                                     gnupghome=self.gnupghome))
 
@@ -53,7 +54,15 @@ class PydebsignTests(unittest.TestCase):
         7. Verify signature of .dsc and .changes
         8. Verify .changes file with `dput -o .changes` command.
         """
-        pass
+        dbsg = debsign.Debsign(self.changes_path,
+                               passphrase='password',
+                               keyid=self.keyid,
+                               gnupghome=self.gnupghome)
+        dbsg.initialize()
+        dbsg.signing_dsc()
+        self.assertTrue(debsign.debsign_process(self.changes_path,
+                                                passphrase='password',
+                                                gnupghome=self.gnupghome))
 
     def test_invalid_dsc(self):
         """ signing .changes and verifying process is as follows;

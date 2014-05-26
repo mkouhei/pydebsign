@@ -245,9 +245,9 @@ def debsign_process(changes_path, passphrase=None, keyid=None, gnupghome=None):
     if dbsg.is_signed(dbsg.dsc_path) is False:
         if dbsg.signing_dsc() is False:
             return False
-        dsc_checksums = dbsg.retrieve_checksums(dbsg.dsc_path)
-        dsc_filesize = dbsg.retrieve_filesize(dbsg.dsc_path)
-        dbsg.rewrite_changes(dsc_filesize, dsc_checksums)
+    dsc_checksums = dbsg.retrieve_checksums(dbsg.dsc_path)
+    dsc_filesize = dbsg.retrieve_filesize(dbsg.dsc_path)
+    dbsg.rewrite_changes(dsc_filesize, dsc_checksums)
 
     if dbsg.signing_changes() is False:
         return False
