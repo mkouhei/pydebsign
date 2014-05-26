@@ -3,6 +3,7 @@
 
 import unittest
 import shutil
+import os
 from pydebsign import debsign
 
 
@@ -11,9 +12,8 @@ class PydebsignTests(unittest.TestCase):
 
     def setUp(self):
         shutil.copytree('pydebsign/tests/test_data', '_build')
-        self.keyrings = ['misc/dummy_gpg/secring.gpg',
-                         'misc/dummy_gpg/pubring.gpg']
-        self.keyid = '5BAFE1FA'
+        self.gnupghome = os.path.abspath('misc/dummy_gpg')
+        self.keyid = '5A046C53'
         self.passphrase = 'password'
 
     def tearDown(self):
@@ -32,15 +32,15 @@ class PydebsignTests(unittest.TestCase):
         self.assertTrue(
             debsign.debsign_process('_build/shello_0.1-1_amd64.changes',
                                     passphrase=self.passphrase,
-                                    keyrings=self.keyrings,
-                                    keyid=self.keyid))
+                                    keyid=self.keyid,
+                                    gnupghome=self.gnupghome))
 
     def test_invalid_passphrase(self):
         """ trying debsign with invalid passphrase """
         self.assertFalse(
             debsign.debsign_process('_build/shello_0.1-1_amd64.changes',
                                     passphrase='dummy',
-                                    keyrings=self.keyrings))
+                                    gnupghome=self.gnupghome))
 
     def test_signed_dsc(self):
         """ signing .changes and verifying process is as follows;
