@@ -34,14 +34,16 @@ class PydebsignTests(unittest.TestCase):
             debsign.debsign_process(self.changes_path,
                                     passphrase=self.passphrase,
                                     keyid=self.keyid,
-                                    gnupghome=self.gnupghome))
+                                    gnupghome=self.gnupghome,
+                                    lintian=False))
 
     def test_invalid_passphrase(self):
         """ trying debsign with invalid passphrase """
         self.assertFalse(
             debsign.debsign_process(self.changes_path,
                                     passphrase='dummy',
-                                    gnupghome=self.gnupghome))
+                                    gnupghome=self.gnupghome,
+                                    lintian=False))
 
     def test_signed_dsc(self):
         """ signing .changes and verifying process is as follows;
@@ -62,7 +64,8 @@ class PydebsignTests(unittest.TestCase):
         dbsg.signing_dsc()
         self.assertTrue(debsign.debsign_process(self.changes_path,
                                                 passphrase='password',
-                                                gnupghome=self.gnupghome))
+                                                gnupghome=self.gnupghome,
+                                                lintian=False))
 
     def test_invalid_dsc(self):
         """ signing .changes and verifying process is as follows;
@@ -84,7 +87,8 @@ class PydebsignTests(unittest.TestCase):
                           debsign.debsign_process,
                           self.changes_path,
                           passphrase='password',
-                          gnupghome=self.gnupghome)
+                          gnupghome=self.gnupghome,
+                          lintian=False)
 
     def test_signed_changes(self):
         """ signing .changes and verifying process is as follows;
@@ -102,7 +106,8 @@ class PydebsignTests(unittest.TestCase):
         shutil.copyfile('%s.signed' % dbsg.dsc_path, dbsg.dsc_path)
         self.assertTrue(debsign.debsign_process(self.changes_path,
                                                 passphrase='password',
-                                                gnupghome=self.gnupghome))
+                                                gnupghome=self.gnupghome,
+                                                lintian=False))
 
     def test_invalid_signed_changes(self):
         """ signing .changes and verifying process is as follows;
@@ -116,4 +121,5 @@ class PydebsignTests(unittest.TestCase):
                           debsign.debsign_process,
                           self.changes_path,
                           passphrase='password',
-                          gnupghome=self.gnupghome)
+                          gnupghome=self.gnupghome,
+                          lintian=False)

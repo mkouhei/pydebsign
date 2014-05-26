@@ -21,8 +21,8 @@ import deb822
 
 class Debsign(object):
     """ debsign class """
-    def __init__(self, changes_path, passphrase=None,
-                 keyid=None, gnupghome=None, verbose=False):
+    def __init__(self, changes_path, passphrase=None, keyid=None,
+                 gnupghome=None, verbose=False, lintian=True):
         """
         :param changes_path: .changes file path
         :param passphrase: passphrase of GPG secret key,
@@ -31,6 +31,8 @@ class Debsign(object):
                            by another shell session.
         :param keyid: id for the key which will be used to do the signing
         :param gnupghome: path of .gnupg existed directory
+        :param verbose: `bool` True is verbose message of gnupg
+        :param lintian: `bool` True is running lintian by dput
         """
         self.changes_path = os.path.abspath(changes_path)
         self.dsc_path = ''
@@ -48,6 +50,7 @@ class Debsign(object):
                                  verbose=verbose)
         else:
             self.gpg = gnupg.GPG(use_agent=use_agent, verbose=verbose)
+        self.lintian = lintian
 
     def initialize(self):
         """ initialize common propeties """
@@ -224,7 +227,10 @@ class Debsign(object):
         and automatically inclide a lintian run any moure.
         Returns: `bool` True is valid, False is invalid.
         """
-        command = 'dput -ol local %s' % self.changes_path
+        if self.lintian:
+            command = 'dput -ol local %s' % self.changes_path
+        else:
+            command = 'dput -o local %s' % self.changes_path
         args = shlex.split(command)
         return subprocess.call(args)
 
@@ -253,8 +259,19 @@ class Debsign(object):
         return True
 
 
-def debsign_process(changes_path, passphrase=None, keyid=None, gnupghome=None):
-    """ debsign process sequence """
+def debsign_process(changes_path, passphrase=None, keyid=None,
+                    gnupghome=None, lintian=True):
+    """ debsign process sequence
+    :param changes_path: .changes file path
+    :param passphrase: passphrase of GPG secret key,
+                       using gpg-agent when this is None.
+                       But cannot use execuceded gpg-agent
+                       by another shell session.
+    :param keyid: id for the key which will be used to do the signing
+    :param gnupghome: path of .gnupg existed directory
+    :param verbose: `bool` True is verbose message of gnupg
+    :param lintian: `bool` True is running lintian by dput
+    """
     dbsg = Debsign(changes_path, passphrase=passphrase,
                    keyid=keyid, gnupghome=gnupghome)
     dbsg.initialize()
