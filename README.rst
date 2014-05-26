@@ -9,6 +9,8 @@ Status
    :target: http://travis-ci.org/mkouhei/pydebsign
 .. image:: https://coveralls.io/repos/mkouhei/pydebsign/badge.png?branch=devel
    :target: https://coveralls.io/r/mkouhei/pydebsign?branch=devel
+.. image:: https://pypip.in/v/pydebsign/badge.png
+   :target: https://crate.io/packages/pydebsign
 
 
 Motivation
@@ -56,3 +58,20 @@ Requires
   * python_gnupg (as debian package is python-gnupg or python3-gnupg)
   * python_debian (as debian package is python-debian or python3-debian)
   * chardet (as debian package is python-chardet or python3-chardet)
+
+
+Usage
+-----
+
+Generic usage;::
+
+  >>> from pydebsign import debsign
+  >>> debsign.debsign_process('/path/to/some.changes', passphrase='secretkey')
+
+
+When use another GPG Keyring instead of default GPG keyring;::
+
+  >>> from pydebsign import debsign
+  >>> debsign.debsign_process('/path/to/some.changes', passphrase='secretkey',
+  ...                         keyid='keyid', gnupghome='/path/to/gpghome')
+
