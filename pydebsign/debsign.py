@@ -72,7 +72,7 @@ class Debsign(object):
 
             if data.find('-----BEGIN PGP SIGNED MESSAGE-----') == 0:
                 # signed data why found gpg header
-                if self.gpg.verify(data).status is None:
+                if self.gpg.verify(data).timestamp is None:
                     # invalid signed data
                     raise ValueError('invalid signed data')
                 else:
