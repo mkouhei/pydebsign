@@ -273,7 +273,7 @@ def debsign_process(changes_path, passphrase=None, keyid=None,
     :param lintian: `bool` True is running lintian by dput
     """
     dbsg = Debsign(changes_path, passphrase=passphrase,
-                   keyid=keyid, gnupghome=gnupghome)
+                   keyid=keyid, gnupghome=gnupghome, lintian=lintian)
     dbsg.initialize()
     file_list = dbsg.parse_changes()
 
