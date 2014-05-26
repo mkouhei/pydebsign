@@ -72,7 +72,7 @@ class Debsign(object):
 
             if data.find('-----BEGIN PGP SIGNED MESSAGE-----') == 0:
                 # signed data why found gpg header
-                if self.gpg.verify(data).status is None:
+                if self.gpg.verify(data).timestamp is None:
                     # invalid signed data
                     raise ValueError('invalid signed data')
                 else:
@@ -242,7 +242,7 @@ class Debsign(object):
         :param file_list: `list` list of file list retrieve .changes
         """
         if self.verify_filesize(dsc_filesize, file_list) is False:
-            raise ValueError('diffrence file size of .dsc')
+            raise ValueError('difference file size of .dsc')
 
         if self.verify_checksums(dsc_checksums, file_list) is False:
             raise ValueError('invalid checksums of .dsc')

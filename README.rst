@@ -32,7 +32,7 @@ It was the same in the case of using gnupg-agent and keyring.::
   ...                            stderr=subprocess.PIPE)
   >>> stdout, stderr = process.communicate('%s\n%s\n') % (`passphrase`, `passphrase`)
 
-So, I decided to make a python library to do the same behavior debsign.
+So, I decided to make a Python library to do the same behavior debsign.
 
 
 Goal
