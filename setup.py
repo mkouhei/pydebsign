@@ -62,7 +62,7 @@ def check_debian_packages():
 check_debian_packages()
 
 setup(name='pydebsign',
-      version='0.1.1',
+      version='0.1.2',
       description='yet another library of debsign',
       long_description=long_description,
       author='Kouhei Maeda',
