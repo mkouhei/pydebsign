@@ -4,6 +4,7 @@
 import unittest
 import shutil
 import os
+import sys
 from pydebsign import debsign
 
 
@@ -123,3 +124,18 @@ class PydebsignTests(unittest.TestCase):
                           passphrase='password',
                           gnupghome=self.gnupghome,
                           lintian=False)
+
+    def test_check_encode(self):
+        """ unit test of check_encode() """
+        _str = '012345689abcdefghijklmnopqrstuvwxwzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        _byte = b'\xc3\x84\xc3\x8b\xc3\x8f\xc3\x96\xc3\x9c\xc3'
+        _byte2 = b'\xa4\xc3\xab\xc3\xaf\xc3\xb6\xc3\xbc\xc3\xbf'
+
+        self.assertFalse(debsign.check_encode(_str))
+
+        if sys.version_info < (3, 0):
+            self.assertFalse(debsign.check_encode(_byte))
+            self.assertFalse(debsign.check_encode(_byte2))
+        else:
+            self.assertTrue(debsign.check_encode(_byte))
+            self.assertTrue(debsign.check_encode(_byte2))

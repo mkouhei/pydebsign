@@ -14,6 +14,7 @@ import re
 import os.path
 import hashlib
 import subprocess
+import codecs
 import shlex
 import gnupg
 import deb822
@@ -66,7 +67,7 @@ class Debsign(object):
         """
         with open(file_path, 'rb') as fileobj:
             data = fileobj.read()
-            if isinstance(data, bytes):
+            if check_encode(data):
                 # for Python 3
                 data = data.decode('utf-8')
 
@@ -115,7 +116,7 @@ class Debsign(object):
             return False
 
         with open(self.changes_path, 'w') as fileobj:
-            if isinstance(signed_data.data, bytes):
+            if check_encode(signed_data.data):
                 fileobj.write(signed_data.data.decode('utf-8'))
             else:
                 fileobj.write(signed_data.data)
@@ -135,7 +136,7 @@ class Debsign(object):
             return False
 
         with open(self.dsc_path, 'w') as fileobj:
-            if isinstance(signed_data.data, bytes):
+            if check_encode(signed_data.data):
                 fileobj.write(signed_data.data.decode('utf-8'))
             else:
                 fileobj.write(signed_data.data)
@@ -160,8 +161,11 @@ class Debsign(object):
         # sha1
         rewrite_data(changes, ('Checksums-Sha256', 'sha256'),
                      filesize, checksums[2])
-        with open(self.changes_path, 'w') as fileobj:
-            fileobj.write(changes.dump())
+        with codecs.open(self.changes_path, 'w', 'utf-8') as fileobj:
+            if check_encode(changes.dump()):
+                fileobj.write(changes.dump().decode('utf-8'))
+            else:
+                fileobj.write(changes.dump())
         return True
 
     def retrieve_checksums(self, file_path):
@@ -308,3 +312,12 @@ def rewrite_data(changes_obj, hash_type, filesize, hashdigest):
     line_index = changes_obj[hash_type[0]].index(line)
     changes_obj[hash_type[0]][line_index]['size'] = str(filesize)
     changes_obj[hash_type[0]][line_index][hash_type[1]] = hashdigest
+
+
+def check_encode(data):
+    """ Check data encode,
+    Returns: `bool`: True is Python3, False is Python2
+    :param data: expecting str (Python2) or bytes (Python3)
+    """
+    return (isinstance(data, bytes) and
+            isinstance(data, str) is False)
