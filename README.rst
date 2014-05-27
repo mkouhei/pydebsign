@@ -46,6 +46,11 @@ Requires
 --------
 
 * Debian system, or the system derived from Debian.
+
+  * Debian GNU/Linux Wheezy
+  * Debian GNU/Linux Jessie/Sid
+  * Ubuntu 14.04 LTS
+
 * Debian package as follows;
 
   * gnupg
