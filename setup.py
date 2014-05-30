@@ -26,7 +26,6 @@ classifiers = [
     "License :: OSI Approved :: ISC License (ISCL)",
     "Programming Language :: Python",
     "Programming Language :: Python :: 2",
-    "Programming Language :: Python :: 2.6",
     "Programming Language :: Python :: 2.7",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.2",
@@ -62,7 +61,7 @@ def check_debian_packages():
 check_debian_packages()
 
 setup(name='pydebsign',
-      version='0.1.2',
+      version='0.1.3',
       description='yet another library of debsign',
       long_description=long_description,
       author='Kouhei Maeda',

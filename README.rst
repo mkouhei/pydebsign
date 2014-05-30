@@ -25,12 +25,17 @@ It was the same in the case of using gnupg-agent and keyring.::
 
   >>> import subprocess
   >>> import shlex
-  >>> command = '/usr/bin/debsign -k %s %s' % (`keyid`, `.changes`)'
-  >>> process = subprocess.Popen(shlex.split(command),
-  ...                            stdin=subprocess.PIPE,
-  ...                            stdout=subprocess.PIPE,
-  ...                            stderr=subprocess.PIPE)
-  >>> stdout, stderr = process.communicate('%s\n%s\n') % (`passphrase`, `passphrase`)
+  >>> command0 = 'echo -e "%s\n%s\n"' % (`passphrase`, `passphrase`)
+  >>> command1 = '/usr/bin/debsign -k %s %s' % (`keyid`, `.changes`)
+  >>> process0 = subprocess.Popen(shlex.split(command0),
+  ...                             stdin=subprocess.PIPE,
+  ...                             stdout=subprocess.PIPE,
+  ...                             stderr=subprocess.PIPE)
+  >>> process1 = subprocess.Popen(shlex.split(command1),
+  ...                             stdin=process0.stdout,
+  ...                             stdout=subprocess.PIPE,
+  ...                             stderr=subprocess.PIPE)
+  >>> stdout, stderr = process.communicate()
 
 So, I decided to make a Python library to do the same behavior debsign.
 

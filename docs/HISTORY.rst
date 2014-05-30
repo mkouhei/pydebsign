@@ -1,6 +1,12 @@
 History
 -------
 
+0.1.3 (2014-05-31)
+^^^^^^^^^^^^^^^^^^
+
+* Fixed #6 dput check local section is failed
+* Unsupported Python2.6
+
 0.1.2 (2014-05-27)
 ^^^^^^^^^^^^^^^^^^
 
