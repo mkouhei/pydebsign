@@ -36,7 +36,8 @@ class PydebsignTests(unittest.TestCase):
                                     passphrase=self.passphrase,
                                     keyid=self.keyid,
                                     gnupghome=self.gnupghome,
-                                    lintian=False))
+                                    lintian=False,
+                                    dput_host='local'))
 
     def test_invalid_passphrase(self):
         """ trying debsign with invalid passphrase """
@@ -139,3 +140,22 @@ class PydebsignTests(unittest.TestCase):
         else:
             self.assertTrue(debsign.check_encode(_byte))
             self.assertTrue(debsign.check_encode(_byte2))
+
+    def test_invalid_dput_host_case(self):
+        """ signing .changes and verifying process is as follows;
+        1. Signing .dsc file with GPG key.
+        2. Retrieve size and md5, sha1, sha256 finger print from signed .dsc.
+        3. Rewrite of above values at .changes.
+        4. Signing .changes file with GPG key.
+        5. Verify checksums from .changes and retreived checksums
+        6. Verify signature of .dsc and .changes
+        7. Fail .changes file with `dput -o .changes` command.
+        """
+        self.assertRaises(KeyError,
+                          debsign.debsign_process,
+                          self.changes_path,
+                          passphrase=self.passphrase,
+                          keyid=self.keyid,
+                          gnupghome=self.gnupghome,
+                          lintian=False,
+                          dput_host='dummy')

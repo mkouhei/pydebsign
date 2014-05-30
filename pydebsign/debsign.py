@@ -23,17 +23,21 @@ import deb822
 class Debsign(object):
     """ debsign class """
     def __init__(self, changes_path, passphrase=None, keyid=None,
-                 gnupghome=None, verbose=False, lintian=True):
+                 gnupghome=None, verbose=False,
+                 lintian=True, dput_host='local'):
         """
         :param changes_path: .changes file path
         :param passphrase: passphrase of GPG secret key,
                            using gpg-agent when this is None.
                            But cannot use execuceded gpg-agent
                            by another shell session.
-        :param keyid: id for the key which will be used to do the signing
+        :param keyid:      id for the key which will be used to do the signing
         :param gnupghome: path of .gnupg existed directory
-        :param verbose: `bool` True is verbose message of gnupg
-        :param lintian: `bool` True is running lintian by dput
+        :param verbose:   `bool` True is verbose message of gnupg
+        :param lintian:   `bool` True is running lintian by dput
+        :param dput_host: `str` specify host identifier for dput
+                          'local' is defined in /etc/dput.cf in default
+                          cf. you know to print `dput -H`.
         """
         self.changes_path = os.path.abspath(changes_path)
         self.dsc_path = ''
@@ -52,6 +56,10 @@ class Debsign(object):
         else:
             self.gpg = gnupg.GPG(use_agent=use_agent, verbose=verbose)
         self.lintian = lintian
+        if check_dput_host(dput_host) is False:
+            raise KeyError('%s is not defined '
+                           'in /etc/dput.cf or ~/.dput.cf' % dput_host)
+        self.dput_host = dput_host
 
     def initialize(self):
         """ initialize common propeties """
@@ -232,9 +240,11 @@ class Debsign(object):
         Returns: `bool` True is valid, False is invalid.
         """
         if self.lintian:
-            command = 'dput -ol local %s' % self.changes_path
+            command = '/usr/bin/dput -ol %s %s' % (self.dput_host,
+                                                   self.changes_path)
         else:
-            command = 'dput -o local %s' % self.changes_path
+            command = '/usr/bin/dput -o %s %s' % (self.dput_host,
+                                                  self.changes_path)
         args = shlex.split(command)
         return subprocess.call(args)
 
@@ -264,20 +274,24 @@ class Debsign(object):
 
 
 def debsign_process(changes_path, passphrase=None, keyid=None,
-                    gnupghome=None, lintian=True):
+                    gnupghome=None, lintian=True, dput_host='local'):
     """ debsign process sequence
     :param changes_path: .changes file path
     :param passphrase: passphrase of GPG secret key,
                        using gpg-agent when this is None.
                        But cannot use execuceded gpg-agent
                        by another shell session.
-    :param keyid: id for the key which will be used to do the signing
+    :param keyid:     id for the key which will be used to do the signing
     :param gnupghome: path of .gnupg existed directory
-    :param verbose: `bool` True is verbose message of gnupg
-    :param lintian: `bool` True is running lintian by dput
+    :param verbose:   `bool` True is verbose message of gnupg
+    :param lintian:   `bool` True is running lintian by dput
+    :param dput_host: `str` specify host identifier for dput
+                      'local' is defined in /etc/dput.cf in default
+                      cf. you know to print `dput -H`.
     """
     dbsg = Debsign(changes_path, passphrase=passphrase,
-                   keyid=keyid, gnupghome=gnupghome, lintian=lintian)
+                   keyid=keyid, gnupghome=gnupghome,
+                   lintian=lintian, dput_host=dput_host)
     dbsg.initialize()
     file_list = dbsg.parse_changes()
 
@@ -321,3 +335,16 @@ def check_encode(data):
     """
     return (isinstance(data, bytes) and
             isinstance(data, str) is False)
+
+
+def check_dput_host(dput_host):
+    """ Check spcified host is defined in dput.cf
+    Returns: `bool`: True is dput_host is defined
+    :param dput_host: `str` dput host
+    """
+    command = '/usr/bin/dput -H'
+    args = shlex.split(command)
+    response = subprocess.check_output(args).decode('utf-8')
+    return dput_host in [host.split(' => ')[0]
+                         for host in response.split('\n')
+                         if len(host.split(' => ')) > 1]
