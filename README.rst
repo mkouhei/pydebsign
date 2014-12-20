@@ -11,7 +11,9 @@ Status
    :target: https://coveralls.io/r/mkouhei/pydebsign?branch=devel
 .. image:: https://pypip.in/v/pydebsign/badge.png
    :target: https://crate.io/packages/pydebsign
-
+.. image:: https://readthedocs.org/projects/pydebsign/badge/?version=latest
+   :target: https://readthedocs.org/projects/pydebsign/?badge=latest
+   :alt: Documentation Status
 
 Motivation
 ----------
