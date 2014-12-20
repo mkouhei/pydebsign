@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 """ setup.py """
-import os.path
+import os
 import sys
 from setuptools import setup
 from setuptools.command.test import test as TestCommand
 import subprocess
 import shlex
-import multiprocessing
 
 
 class Tox(TestCommand):
@@ -28,7 +27,6 @@ classifiers = [
     "Programming Language :: Python :: 2",
     "Programming Language :: Python :: 2.7",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.2",
     "Programming Language :: Python :: 3.3",
     "Programming Language :: Python :: 3.4",
     "Programming Language :: Python :: Implementation :: CPython",
@@ -48,7 +46,11 @@ long_description = (
 requires = ['setuptools',
             'python_gnupg',
             'python_debian',
-            'chardet']
+            'chardet',
+            'sphinx']
+
+with open('requirements.txt', 'w') as _file:
+    _file.write('\n'.join(requires))
 
 
 def check_debian_packages():
@@ -58,10 +60,11 @@ def check_debian_packages():
             return True
         else:
             sys.exit(1)
-check_debian_packages()
+if os.environ.get('READTHEDOCS', None) != 'True':
+    check_debian_packages()
 
 setup(name='pydebsign',
-      version='0.1.3',
+      version='0.1.4',
       description='yet another library of debsign',
       long_description=long_description,
       author='Kouhei Maeda',

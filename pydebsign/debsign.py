@@ -1,14 +1,19 @@
 # -*- coding: utf-8 -*-
-""" pydebsign.debsign
+"""
+pydebsign.debsign
+-----------------
+
 debsign process as follows;
----
+
 1. Signing .dsc file with GPG key.
 2. Retrieve size and md5, sha1, sha256 checksums from signed .dsc.
 3. Rewrite of above values at .changes.
 4. Siging .changes file with GPG key.
----
+
 optional:
-   How to verify signed files: `dput -o .changes` command.
+How to verify signed files ``dput -o .changes`` command.
+
+----
 """
 import re
 import os.path
@@ -21,33 +26,28 @@ import deb822
 
 
 class Debsign(object):
-    """ debsign class """
+    """The :class:`Debsign <Debsign>` object."""
     def __init__(self, changes_path, passphrase=None, keyid=None,
                  gnupghome=None, verbose=False,
                  lintian=True, dput_host='local'):
-        """
-        :param changes_path: .changes file path
-        :param passphrase: passphrase of GPG secret key,
-                           using gpg-agent when this is None.
-                           But cannot use execuceded gpg-agent
-                           by another shell session.
-        :param keyid:      id for the key which will be used to do the signing
-        :param gnupghome: path of .gnupg existed directory
-        :param verbose:   `bool` True is verbose message of gnupg
-        :param lintian:   `bool` True is running lintian by dput
-        :param dput_host: `str` specify host identifier for dput
-                          'local' is defined in /etc/dput.cf in default
-                          cf. you know to print `dput -H`.
-        """
+        #: changes file path: .changes file path
         self.changes_path = os.path.abspath(changes_path)
+
+        #: dsc file path
         self.dsc_path = ''
+
         if passphrase:
+            #: passphrase of GPG secret key, using gpg-agent
+            #: when this is None. But cannot use execuceded gpg-agent
+            #: by another shell session.
             self.passphrase = passphrase
             use_agent = False
         else:
             self.passphrase = None
             use_agent = True
+        #: keyid id for the key which will be used to do the signing
         self.keyid = keyid
+
         if gnupghome:
             os.environ['GNUPGHOME'] = os.path.abspath(gnupghome)
             self.gpg = gnupg.GPG(gnupghome=gnupghome,
@@ -55,23 +55,33 @@ class Debsign(object):
                                  verbose=verbose)
         else:
             self.gpg = gnupg.GPG(use_agent=use_agent, verbose=verbose)
+        #: lintian mode (default: ``True``);
+        #: True is running lintian by dput
         self.lintian = lintian
         if check_dput_host(dput_host) is False:
             raise KeyError('%s is not defined '
                            'in /etc/dput.cf or ~/.dput.cf' % dput_host)
+        #: :data:`str`: specify host identifier for dput
+        #: ``local`` is defined in ``/etc/dput.cf`` in default;
+        #: cf. you know to print ``dput -H``.
         self.dput_host = dput_host
 
     def initialize(self):
-        """ initialize common propeties """
+        """
+        initialize common propeties
+        """
         base_path = os.path.dirname(os.path.abspath(self.changes_path))
         file_list = self.parse_changes()
         self.dsc_path = os.path.join(base_path,
                                      self.retrieve_dsc_path(file_list[0]))
 
     def is_signed(self, file_path):
-        """ check file is signed with GPG key,
-        Returns: `bool` True is signed, False is unsigned.
-        :param file_path: expecting .dsc file or .changes file.
+        """
+        checking signed file with GPG key
+
+        :rtype: bool
+        :return: ``True`` is signed, ``False`` is unsigned.
+        :param str file_path: expecting .dsc file or .changes file.
         """
         with open(file_path, 'rb') as fileobj:
             data = fileobj.read()
@@ -92,8 +102,11 @@ class Debsign(object):
                 return False
 
     def parse_changes(self):
-        """ parse .changes and retrieve efile size and file name list.
-        Returns: file List of list with file size and checksums.
+        """
+        parse .changes and retrieve efile size and file name list.
+
+        :rtype: list
+        :return: file list with file size and checksums.
         """
         with open(self.changes_path, 'rb') as fileobj:
             changes = deb822.Changes(fileobj)
@@ -101,20 +114,26 @@ class Debsign(object):
                 changes['Checksums-Sha1'],
                 changes['Checksums-Sha256']]
 
-    def retrieve_dsc_path(self, file_list):
-        """ retrieve dsc file path from file list.
-        Returns: dsc file path
-        :param file_list: expecting file list as return of parse_changes().
+    @staticmethod
+    def retrieve_dsc_path(file_list):
+        """
+        retrieve dsc file path from file list.
+
+        :rtype: str
+        :return: dsc file path
+        :param list file_list: file list as return of parse_changes().
         """
         pattern = re.compile(r'.dsc\Z')
         return [_file.get('name') for _file in file_list
                 if pattern.search(_file.get('name'))][0]
 
     def signing_changes(self):
-        """ sign .changes file with GPG key,
+        """
+        signing .changes file with GPG key,
         invoke siging_dsc() when not yet to sign .dsc file.
-        ---
-        Returns: `bool` True is successful, False is failure.
+
+        :rtype: bool
+        :return: ``True`` is successful, ``False`` is failure.
         """
         with open(self.changes_path, 'rb') as fileobj:
             data = fileobj.read()
@@ -131,10 +150,12 @@ class Debsign(object):
         return True
 
     def signing_dsc(self):
-        """ sign .dscs file with GPG key,
+        """
+        signing .dscs file with GPG key,
         invoke rewrite_changes() when this method is succeeded.
-        ---
-        Returns: `bool` True is successful, False is failure.
+
+        :rtype: bool
+        :return: ``True`` is successful, ``False`` is failure.
         """
         with open(self.dsc_path, 'rb') as fileobj:
             data = fileobj.read()
@@ -151,13 +172,15 @@ class Debsign(object):
         return True
 
     def rewrite_changes(self, filesize, checksums):
-        """ rewrite file size and hash fingerprint of .dsc file.
+        """
+        rewrite file size and hash fingerprint of .dsc file.
         invoke retrieve_checksums() and retreive_filesize().
         this method is invoked by siging_dsc().
-        ---
-        Returns: status code
-        :param filesize: expecting `int` .dsc file size
-        :param checksums: expecting `tuple` of md5sum, sha1, sha256 hexdigest
+
+        :rtype: bool
+        :return: status code
+        :param int filesize: .dsc file size
+        :param tuple checksums: md5sum, sha1, sha256 hexdigest
         """
         with open(self.changes_path, 'rb') as fileobj:
             changes = deb822.Changes(fileobj)
@@ -176,10 +199,15 @@ class Debsign(object):
                 fileobj.write(changes.dump())
         return True
 
-    def retrieve_checksums(self, file_path):
-        """ retrieve md5, sha1, sha256 checksums.
-        Returns: tupul of md5, sha1, sha256 hexdigest.
-        :param file_path: expecting .dsc file path.
+    @staticmethod
+    def retrieve_checksums(file_path):
+        """
+        retrieve md5, sha1, sha256 checksums.
+
+        :rtype: tuple
+        :return: md5, sha1, sha256 hexdigest.
+
+        :param str file_path: expecting .dsc file path.
         """
         with open(file_path, 'rb') as fileobj:
             data = fileobj.read()
@@ -187,28 +215,43 @@ class Debsign(object):
                 hashlib.sha1(data).hexdigest(),
                 hashlib.sha256(data).hexdigest())
 
-    def retrieve_filesize(self, file_path):
-        """ retrieve file size.
-        Returns: `int` fils size
-        :param file_path: `str` absolute file path
+    @staticmethod
+    def retrieve_filesize(file_path):
+        """
+        retrieve file size.
+
+        :rtype: int
+        :return: fils size
+
+        :param str file_path: absolute file path
         """
         return os.path.getsize(file_path)
 
-    def verify_filesize(self, dsc_filesize, file_list):
-        """ verify file size with file list retrieved from changes.
-        Returns: `bool` True is valid, False is invalid.
-        :param dsc_filesize: `int` file size of .dsc
-        :param file_list: `list` of file list as return of parse_changes().
+    @staticmethod
+    def verify_filesize(dsc_filesize, file_list):
+        """
+        verify file size with file list retrieved from changes.
+
+        :rtype: bool
+        :return: ``True`` is valid, ``False`` is invalid.
+
+        :param int dsc_filesize: file size of .dsc
+        :param list file_list: file list as return of parse_changes().
         """
         pattern = re.compile(r'.dsc\Z')
         return dsc_filesize == [int(_file.get('size'))
                                 for _file in file_list[0]
                                 if pattern.search(_file.get('name'))][0]
 
-    def verify_checksums(self, dsc_checksums, file_list):
-        """ verify checksums (and size) with file list retrieved from changes.
-        Returns: `bool` True is valid, False is invalid.
-        :param file_list: `list` of file list as return of parse_changes().
+    @staticmethod
+    def verify_checksums(dsc_checksums, file_list):
+        """
+        verify checksums (and size) with file list retrieved from changes.
+
+        :rtype: bool
+        :return: ``True`` is valid, ``False`` is invalid.
+
+        :param list file_list: file list as return of parse_changes().
         """
         pattern = re.compile(r'.dsc\Z')
 
@@ -227,17 +270,22 @@ class Debsign(object):
         return True
 
     def verify_signature(self, file_path):
-        """ verify signature of file with GPG key.
-        Returns: `bool` True is valid, False is invalid
-        :param file_path: expecting .dsc file path or .changes file path
+        """verify signature of file with GPG key.
+
+        :rtype: bool
+        :return: ``True`` is valid, ``False`` is invalid
+
+        :param str file_path: expecting .dsc file path or .changes file path
         """
         with open(file_path) as fileobj:
             return self.gpg.verify(fileobj.read()).valid
 
     def verify_with_dput(self):
-        """ verify .changes and .dsc files with `dput` command,
+        """verify .changes and .dsc files with ``dput`` command,
         and automatically inclide a lintian run any moure.
-        Returns: `bool` True is valid, False is invalid.
+
+        :rtype: bool
+        :return: ``True`` is valid, ``False`` is invalid.
         """
         if self.lintian:
             command = '/usr/bin/dput -ol %s %s' % (self.dput_host,
@@ -249,11 +297,15 @@ class Debsign(object):
         return subprocess.call(args)
 
     def verification(self, dsc_filesize, dsc_checksums, file_list):
-        """ verification of signed files.
-        Returns: `bool` True is valid, False is invalid.
-        :param dsc_filesize: `int` file size retreived from .changes
-        :param dsc_checksums: `tuple` .dsc checksums retrieved from .changes
-        :param file_list: `list` list of file list retrieve .changes
+        """
+        verification of signed files.
+
+        :rtype: bool
+        :return: ``True`` is valid, ``False`` is invalid.
+
+        :param int dsc_filesize: file size retreived from .changes
+        :param tuple dsc_checksums: .dsc checksums retrieved from .changes
+        :param list file_list: file list retrieve .changes
         """
         if self.verify_filesize(dsc_filesize, file_list) is False:
             raise ValueError('difference file size of .dsc')
@@ -275,19 +327,26 @@ class Debsign(object):
 
 def debsign_process(changes_path, passphrase=None, keyid=None,
                     gnupghome=None, lintian=True, dput_host='local'):
-    """ debsign process sequence
-    :param changes_path: .changes file path
-    :param passphrase: passphrase of GPG secret key,
-                       using gpg-agent when this is None.
-                       But cannot use execuceded gpg-agent
-                       by another shell session.
-    :param keyid:     id for the key which will be used to do the signing
-    :param gnupghome: path of .gnupg existed directory
-    :param verbose:   `bool` True is verbose message of gnupg
-    :param lintian:   `bool` True is running lintian by dput
-    :param dput_host: `str` specify host identifier for dput
-                      'local' is defined in /etc/dput.cf in default
-                      cf. you know to print `dput -H`.
+    """
+    debsign process sequence
+
+    :rtype: bool
+    :return: ``True`` is valid, ``False`` is invalid.
+
+    :param str changes_path: .changes file path
+    :param str passphrase: passphrase of GPG secret key, using gpg-agent
+
+        when this is None. But cannot use execuceded gpg-agent
+        by another shell session.
+
+    :param str keyid: id for the key which will be used to do the signing
+    :param str gnupghome: path of .gnupg existed directory
+    :param bool verbose: ``True`` is verbose message of gnupg
+    :param bool lintian: ``True`` is running lintian by dput
+    :param str dput_host: specify host identifier for dput ``local``
+
+        is defined in ``/etc/dput.cf`` in default
+        cf. you know to print ``dput -H``.
     """
     dbsg = Debsign(changes_path, passphrase=passphrase,
                    keyid=keyid, gnupghome=gnupghome,
@@ -314,11 +373,12 @@ def debsign_process(changes_path, passphrase=None, keyid=None,
 
 
 def rewrite_data(changes_obj, hash_type, filesize, hashdigest):
-    """ rewrite .changes object with new file size and hashdigest.
-    :param changes_obj: :class:`Deb822Dict` object
-    :param hash_type: `tuple` hash type of .changes
-    :param filesize: expecting `int` .dsc file size
-    :param hashdigest: expecting `str` .dsc hash digest
+    """rewrite .changes object with new file size and hashdigest.
+
+    :param `Deb822Dict` changes_obj: :class:`Deb822Dict` object
+    :param tuple hash_type: hash type of .changes
+    :param int filesize: expecting .dsc file size
+    :param str hashdigest: expecting .dsc hash digest
     """
     pattern = re.compile(r'.dsc\Z')
     line = [line for line in changes_obj[hash_type[0]]
@@ -329,18 +389,26 @@ def rewrite_data(changes_obj, hash_type, filesize, hashdigest):
 
 
 def check_encode(data):
-    """ Check data encode,
-    Returns: `bool`: True is Python3, False is Python2
-    :param data: expecting str (Python2) or bytes (Python3)
+    """
+    Check data encode
+
+    :rtype: bool
+    :return: ``True`` is Python3, ``False`` is Python2
+
+    :param str|bytes data: expecting str (Python2) or bytes (Python3)
     """
     return (isinstance(data, bytes) and
             isinstance(data, str) is False)
 
 
 def check_dput_host(dput_host):
-    """ Check spcified host is defined in dput.cf
-    Returns: `bool`: True is dput_host is defined
-    :param dput_host: `str` dput host
+    """
+    Check spcified host is defined in dput.cf
+
+    :rtype: bool
+    :return: ``True`` is dput_host is defined
+
+    :param str dput_host: dput host
     """
     command = '/usr/bin/dput -H'
     args = shlex.split(command)
