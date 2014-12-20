@@ -6,7 +6,6 @@ from setuptools import setup
 from setuptools.command.test import test as TestCommand
 import subprocess
 import shlex
-import multiprocessing
 
 
 class Tox(TestCommand):
@@ -48,7 +47,11 @@ long_description = (
 requires = ['setuptools',
             'python_gnupg',
             'python_debian',
-            'chardet']
+            'chardet',
+            'sphinx']
+
+with open('requirements.txt', 'w') as _file:
+    _file.write('\n'.join(requires))
 
 
 def check_debian_packages():
