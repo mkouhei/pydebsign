@@ -1,1 +1,6 @@
 random_seed
+requirements.txt
+htmlcov
+.cache/
+docs/build/
+*.egg
