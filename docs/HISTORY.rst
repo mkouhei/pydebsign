@@ -1,6 +1,13 @@
 History
 -------
 
+0.1.4 (2014-12-21)
+^^^^^^^^^^^^^^^^^^
+
+* Unsupported Python 3.2
+* Added Sphinx documents and applied Read the docs
+* Migrated pep8, pyflakes, pychecker, pylint to Tox
+
 0.1.3 (2014-05-31)
 ^^^^^^^^^^^^^^^^^^
 

@@ -64,7 +64,7 @@ if os.environ.get('READTHEDOCS', None) != 'True':
     check_debian_packages()
 
 setup(name='pydebsign',
-      version='0.1.3',
+      version='0.1.4',
       description='yet another library of debsign',
       long_description=long_description,
       author='Kouhei Maeda',
