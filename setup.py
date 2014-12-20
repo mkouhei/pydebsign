@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """ setup.py """
-import os.path
+import os
 import sys
 from setuptools import setup
 from setuptools.command.test import test as TestCommand
@@ -60,7 +60,8 @@ def check_debian_packages():
             return True
         else:
             sys.exit(1)
-check_debian_packages()
+if os.environ.get('READTHEDOCS', None) != 'True':
+    check_debian_packages()
 
 setup(name='pydebsign',
       version='0.1.3',
