@@ -46,8 +46,8 @@ long_description = (
 requires = ['setuptools',
             'python_gnupg',
             'python_debian',
-            'chardet',
-            'sphinx']
+            'pexpect',
+            'chardet']
 
 with open('requirements.txt', 'w') as _file:
     _file.write('\n'.join(requires))
