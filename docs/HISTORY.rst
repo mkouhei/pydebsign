@@ -1,6 +1,14 @@
 History
 -------
 
+0.1.5 (2015-08-25)
+^^^^^^^^^^^^^^^^^^
+
+* Changes Sphinx theme to sphinx_rtd_theme.
+* Merge pull request #9 from mkouhei/travis-packages
+* Adds execute apt-get update.
+* Enabled sudo explicitly.
+
 0.1.4 (2014-12-21)
 ^^^^^^^^^^^^^^^^^^
 

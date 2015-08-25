@@ -1,11 +1,13 @@
 language: python
 python: 3.4
+sudo: true
 env:
   - TOX_ENV=py27
   - TOX_ENV=py33
   - TOX_ENV=py34
   - TOX_ENV=pypy
 install:
+  - sudo apt-get update
   - sudo apt-get install -y gnupg dput lintian
   - pip install tox coveralls
 script:
