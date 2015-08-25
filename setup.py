@@ -21,7 +21,7 @@ class Tox(TestCommand):
 
 
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "License :: OSI Approved :: ISC License (ISCL)",
     "Programming Language :: Python",
     "Programming Language :: Python :: 2",
@@ -64,7 +64,7 @@ if os.environ.get('READTHEDOCS', None) != 'True':
     check_debian_packages()
 
 setup(name='pydebsign',
-      version='0.1.4',
+      version='0.1.5',
       description='yet another library of debsign',
       long_description=long_description,
       author='Kouhei Maeda',
