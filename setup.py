@@ -48,7 +48,8 @@ requires = ['setuptools',
             'python_gnupg',
             'python_debian',
             'pexpect',
-            'chardet']
+            'chardet',
+            'pguard']
 
 with open('requirements.txt', 'w') as _file:
     _file.write('\n'.join(requires))

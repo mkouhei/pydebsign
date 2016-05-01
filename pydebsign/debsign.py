@@ -23,6 +23,8 @@ import codecs
 import shlex
 import gnupg
 import deb822
+from pguard import guard
+from pguard import guard_cl as g
 
 
 class Debsign(object):
@@ -307,22 +309,21 @@ class Debsign(object):
         :param tuple dsc_checksums: .dsc checksums retrieved from .changes
         :param list file_list: file list retrieve .changes
         """
-        if self.verify_filesize(dsc_filesize, file_list) is False:
-            raise ValueError('difference file size of .dsc')
-
-        if self.verify_checksums(dsc_checksums, file_list) is False:
-            raise ValueError('invalid checksums of .dsc')
-
-        if self.verify_signature(self.dsc_path) is False:
-            raise ValueError('invalid signature of .dsc')
-
-        if self.verify_signature(self.changes_path) is False:
-            raise ValueError('invalid signature of .changes')
-
-        if self.verify_with_dput() != 0:
-            raise ValueError('invalid checking with dput')
-
-        return True
+        result = guard(
+            g(ValueError('difference file size of .dsc'),
+              self.verify_filesize(dsc_filesize, file_list) is False),
+            g(ValueError('invalid checksums of .dsc'),
+              self.verify_checksums(dsc_checksums, file_list) is False),
+            g(ValueError('invalid signature of .dsc'),
+              self.verify_signature(self.dsc_path) is False),
+            g(ValueError('invalid signature of .changes'),
+              self.verify_signature(self.changes_path) is False),
+            g(ValueError('invalid checking with dput'),
+              self.verify_with_dput() != 0),
+            g(True))
+        if result is not True:
+            raise result
+        return result
 
 
 def debsign_process(changes_path, passphrase=None, keyid=None,
