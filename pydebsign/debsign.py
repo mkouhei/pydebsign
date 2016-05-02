@@ -256,20 +256,20 @@ class Debsign(object):
         :param list file_list: file list as return of parse_changes().
         """
         pattern = re.compile(r'.dsc\Z')
-
-        if dsc_checksums[0] != [_file.get('md5sum')
-                                for _file in file_list[0]
-                                if pattern.search(_file.get('name'))][0]:
-            return False
-        if dsc_checksums[1] != [_file.get('sha1')
-                                for _file in file_list[1]
-                                if pattern.search(_file.get('name'))][0]:
-            return False
-        if dsc_checksums[2] != [_file.get('sha256')
-                                for _file in file_list[2]
-                                if pattern.search(_file.get('name'))][0]:
-            return False
-        return True
+        return guard(
+            g(False,
+              dsc_checksums[0] != [_file.get('md5sum')
+                                   for _file in file_list[0]
+                                   if pattern.search(_file.get('name'))][0]),
+            g(False,
+              dsc_checksums[1] != [_file.get('sha1')
+                                   for _file in file_list[1]
+                                   if pattern.search(_file.get('name'))][0]),
+            g(False,
+              dsc_checksums[2] != [_file.get('sha256')
+                                   for _file in file_list[2]
+                                   if pattern.search(_file.get('name'))][0]),
+            g(True))
 
     def verify_signature(self, file_path):
         """verify signature of file with GPG key.
