@@ -18,11 +18,11 @@ Status
 Motivation
 ----------
 
-`debsign` is a command of devscripts that sign a Debian .changes and .dsc file pare using GPG,
-the command cannot use in environment witout TTY, for example invokeking by CI.
+`debsign` is a command of devscripts that signs a Debian .changes and .dsc file pair using GPG.
+The command cannot be used in environments without TTY, for example, as invoked by CI.
 
-I had tried to use debsign from `subprocess` module of Python as follow,
-but entering passphrase prompt is always returned.
+I had tried to use debsign via `subprocess` module of Python as follows,
+but passphrase prompt is always shown.
 It was the same in the case of using gnupg-agent and keyring.::
 
   >>> import subprocess
@@ -39,7 +39,8 @@ It was the same in the case of using gnupg-agent and keyring.::
   ...                             stderr=subprocess.PIPE)
   >>> stdout, stderr = process.communicate()
 
-So, I decided to make a Python library to do the same behavior debsign.
+So, I decided to make a Python library to do the same (have behavior of debsign),
+but work as expected without TTY.
 
 
 Goal
