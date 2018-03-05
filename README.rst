@@ -9,7 +9,7 @@ Status
    :target: http://travis-ci.org/mkouhei/pydebsign
 .. image:: https://coveralls.io/repos/mkouhei/pydebsign/badge.png?branch=devel
    :target: https://coveralls.io/r/mkouhei/pydebsign?branch=devel
-.. image:: https://pypip.in/v/pydebsign/badge.png
+.. image:: https://img.shields.io/pypi/v/pydebsign.svg
    :target: https://crate.io/packages/pydebsign
 .. image:: https://readthedocs.org/projects/pydebsign/badge/?version=latest
    :target: https://readthedocs.org/projects/pydebsign/?badge=latest
